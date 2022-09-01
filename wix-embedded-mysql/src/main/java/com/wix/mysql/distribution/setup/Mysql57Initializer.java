@@ -8,6 +8,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -23,14 +26,21 @@ public class Mysql57Initializer implements Initializer {
         File baseDir = files.baseDir();
         FileUtils.deleteDirectory(new File(baseDir, "data"));
 
-        Process p = Runtime.getRuntime().exec(new String[] {
-                        files.executable().getAbsolutePath(),
-                        "--no-defaults",
-                        "--initialize-insecure",
-                        "--ignore-db-dir",
-                        format("--basedir=%s", baseDir),
-                        format("--datadir=%s/data", baseDir)
-        });
+        List<String> systemVariables = new ArrayList<>();
+        systemVariables.add(files.executable().getAbsolutePath());
+        systemVariables.add("--no-defaults");
+        systemVariables.add("--initialize-insecure");
+        systemVariables.add("--ignore-db-dir");
+        systemVariables.add(format("--basedir=%s", baseDir));
+        systemVariables.add(format("--datadir=%s/data", baseDir));
+
+        List<String> configSystemVariables = config.getServerVariables().stream()
+                .filter(MysqldConfig.ServerVariable::isInitializer)
+                .map(MysqldConfig.ServerVariable::toCommandLineArgument)
+                .collect(Collectors.toList());
+        systemVariables.addAll(configSystemVariables);
+
+        Process p = Runtime.getRuntime().exec(systemVariables.toArray(new String[0]));
 
         new ProcessRunner(files.executable().getAbsolutePath()).run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
