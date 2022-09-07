@@ -157,6 +157,21 @@ public class MysqldConfig extends ExecutableProcessConfig {
             return withTimeZone(TimeZone.getTimeZone(timeZoneId));
         }
 
+        public Builder withInitServerVariable(String name, boolean value) {
+            this.serverVariables.add(new ServerVariable<>(true, name, value));
+            return this;
+        }
+
+        public Builder withInitServerVariable(String name, int value) {
+            this.serverVariables.add(new ServerVariable<>(true, name, value));
+            return this;
+        }
+
+        public Builder withInitServerVariable(String name, String value) {
+            this.serverVariables.add(new ServerVariable<>(true, name, value));
+            return this;
+        }
+
         /**
          * Provide mysql server option
          *
@@ -233,12 +248,24 @@ public class MysqldConfig extends ExecutableProcessConfig {
     }
 
     public static class ServerVariable<T> {
+        private final boolean initializer;
         private final String name;
         private final T value;
 
-        ServerVariable(final String name, final T value) {
+        ServerVariable(final boolean initializer, final String name, final T value) {
+            this.initializer = initializer;
             this.name = name;
             this.value = value;
+        }
+
+        ServerVariable(final String name, final T value) {
+            this.initializer = false;
+            this.name = name;
+            this.value = value;
+        }
+
+        public boolean isInitializer() {
+            return initializer;
         }
 
         public String toCommandLineArgument() {
