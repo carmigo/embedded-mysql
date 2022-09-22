@@ -6,6 +6,8 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -15,6 +17,7 @@ import java.nio.file.Paths;
 
 public class NixBefore8Initializer implements Initializer {
 
+    private final static Logger logger = LoggerFactory.getLogger(NixBefore8Initializer.class);
     private static final String SEP = File.separator;
 
     @Override
@@ -31,7 +34,7 @@ public class NixBefore8Initializer implements Initializer {
         File[] soFiles = libDir.listFiles(filter);
         for (File file : soFiles) {
             Files.createSymbolicLink(Paths.get(baseDir + SEP + "bin" + SEP + file.getName()), Paths.get(file.getPath()));
-            System.out.println("Symlink " + file.getName());
+            logger.debug("Symlink " + file.getName());
         }
     }
 }
