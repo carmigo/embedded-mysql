@@ -9,10 +9,11 @@ import java.util.Objects;
 import static de.flapdoodle.embed.process.config.store.FileType.Executable;
 import static de.flapdoodle.embed.process.config.store.FileType.Library;
 
-public class Win8FileSetEmitter implements FileSetEmitter {
+public class Win80_17FileSetEmitter implements FileSetEmitter {
     @Override
     public boolean matches(Platform platform, Version version) {
-        return !platform.isUnixLike() && Objects.equals(version.getMajorVersion(), "8.0");
+        return !platform.isUnixLike() && Objects.equals(version.getMajorVersion(), "8.0")
+                && version.getMinorVersion() <= 17;
     }
 
     @Override
