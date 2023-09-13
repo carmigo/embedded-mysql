@@ -46,7 +46,7 @@ public class DownloadConfig implements AdditionalConfig {
     public static class Builder {
         private IProxyFactory proxyFactory = new NoProxyFactory();
         private String cacheDir = new File(System.getProperty("user.home"), ".embedmysql").getPath();
-        private String baseUrl = "https://dev.mysql.com/get/Downloads/";
+        private String baseUrl = "https://dev.mysql.com/get/Downloads";
 
         /**
          * Download cache location override that by default is set to '~/.embedmysql'.
