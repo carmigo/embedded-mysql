@@ -4,6 +4,7 @@ import com.wix.mysql.config.*;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import de.flapdoodle.embed.process.distribution.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,14 @@ public class EmbeddedMysql {
 
         try {
             executable.start();
+            if (Platform.detect() == Platform.Linux && "8.0".equals(mysqldConfig.getVersion().getMajorVersion())
+                    && mysqldConfig.getVersion().getMinorVersion() > 17) {
+                // MySQL 8.0.18+ on Linux needs a bit of time to start
+                Thread.sleep(1_000L);
+            }
             getClient(SCHEMA, mysqldConfig.getCharset()).executeCommands(
                     format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", mysqldConfig.getUsername(), mysqldConfig.getPassword()));
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
